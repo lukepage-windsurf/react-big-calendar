@@ -1,1 +1,1 @@
-export default from './Elation';
+export default from './Elation.jsx';

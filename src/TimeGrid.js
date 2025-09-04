@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import cn from 'classnames';
-import { findDOMNode } from 'react-dom';
 
 import dates from './utils/dates';
 import localizer from './localizer'
@@ -85,12 +84,12 @@ export default class TimeGrid extends Component {
     this.state = { gutterWidth: undefined, isOverflowing: null };
     this.handleSelectEvent = this.handleSelectEvent.bind(this)
     this.handleHeaderClick = this.handleHeaderClick.bind(this)
-  }
-
-  componentWillMount() {
     this._gutters = [];
     this.calculateScroll();
+    this.contentRef = React.createRef();
+    this.headerCellRef = React.createRef();
   }
+
 
   componentDidMount() {
     this.checkOverflow();
@@ -101,22 +100,21 @@ export default class TimeGrid extends Component {
     this.applyScroll();
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
+    const { start, scrollToTime } = prevProps;
+
     if (this.props.width == null && !this.state.gutterWidth) {
       this.measureGutter()
     }
 
     this.applyScroll();
     //this.checkOverflow()
-  }
 
-  componentWillReceiveProps(nextProps) {
-    const { start, scrollToTime } = this.props;
     // When paginating, reset scroll
     if (
-      nextProps.view !== this.props.view &&
-      (!dates.eq(nextProps.start, start, 'minute') ||
-       !dates.eq(nextProps.scrollToTime, scrollToTime, 'minute'))
+      this.props.view !== prevProps.view &&
+      (!dates.eq(this.props.start, start, 'minute') ||
+       !dates.eq(this.props.scrollToTime, scrollToTime, 'minute'))
     ) {
       this.calculateScroll();
     }
@@ -165,14 +163,14 @@ export default class TimeGrid extends Component {
 
     allDayEvents.sort((a, b) => sortEvents(a, b, this.props))
 
-    let gutterRef = ref => this._gutters[1] = ref && findDOMNode(ref);
+    let gutterRef = ref => this._gutters[1] = ref && ref;
 
     return (
       <div className={`rbc-time-view rbc-time-view-${this.props.view}`}>
 
         {this.renderHeader(range, allDayEvents, width)}
 
-        <div ref='content' className='rbc-time-content'>
+        <div ref={this.contentRef} className='rbc-time-content'>
           {/* dummy div replacement for timeIndicator to keep css working */}
           <div style={{ display: 'none' }} />
 
@@ -251,7 +249,7 @@ export default class TimeGrid extends Component {
 
     return (
       <div
-        ref='headerCell'
+        ref={this.headerCellRef}
         className={cn(
           'rbc-time-header',
           isOverflowing && 'rbc-overflowing'
@@ -375,8 +373,8 @@ export default class TimeGrid extends Component {
   }
 
   applyScroll() {
-    if (this._scrollRatio) {
-      const { content } = this.refs;
+    if (this._scrollRatio && this.contentRef.current) {
+      const content = this.contentRef.current;
       content.scrollTop = content.scrollHeight * this._scrollRatio;
       // Only do this once
       this._scrollRatio = null;
@@ -393,9 +391,9 @@ export default class TimeGrid extends Component {
   }
 
   checkOverflow() {
-    if (this._updatingOverflow) return;
+    if (this._updatingOverflow || !this.contentRef.current) return;
 
-    let isOverflowing = this.refs.content.scrollHeight > this.refs.content.clientHeight;
+    let isOverflowing = this.contentRef.current.scrollHeight > this.contentRef.current.clientHeight;
 
     if (this.state.isOverflowing !== isOverflowing) {
       this._updatingOverflow = true;

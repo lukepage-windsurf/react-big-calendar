@@ -1,36 +1,36 @@
 import React from 'react';
 import Api from './Api';
-import Intro from './Intro.md';
+// import Intro from './Intro.md';
 import cn from 'classnames';
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
-import localizer from 'react-big-calendar/lib/localizers/globalize';
+import localizer from 'react-big-calendar/localizers/globalize';
 import globalize from 'globalize';
 
 localizer(globalize);
 
-import 'react-big-calendar/lib/less/styles.less';
+import 'react-big-calendar/less/styles.less';
 import './styles.less';
 import './prism.less';
 
 
 class Example extends React.Component {
   state = {
-    selected: 'elation',
+    selected: 'selectable',
   };
 
   render() {
     let selected = this.state.selected;
     let Current = {
-      // basic: require('./demos/basic'),
-      elation: require('./demos/elation'),
-      selectable: require('./demos/selectable'),
-      cultures: require('./demos/cultures'),
-      popup: require('./demos/popup'),
-      rendering: require('./demos/rendering'),
-      customView: require('./demos/customView'),
-      timeslots: require('./demos/timeslots'),
-      dnd: require('./demos/dnd')
+      // basic: require('./demos/basic').default,
+      elation: require('./demos/elation').default,
+      selectable: require('./demos/selectable').default,
+      cultures: require('./demos/cultures').default,
+      popup: require('./demos/popup').default,
+      rendering: require('./demos/rendering').default,
+      customView: require('./demos/customView').default,
+      timeslots: require('./demos/timeslots').default,
+      dnd: require('./demos/dnd').default
     }[selected];
 
     return (
@@ -76,7 +76,10 @@ class Example extends React.Component {
           </div>
         </div>
         <div className='docs'>
-          <Intro className='contain section'/>
+          <div className='contain section'>
+            <h1>React Big Calendar Examples</h1>
+            <p>This is the React Big Calendar component library migrated to React 19.</p>
+          </div>
           <Api className='contain section' />
         </div>
       </div>
@@ -89,4 +92,5 @@ class Example extends React.Component {
   };
 }
 
-render(<Example/>, document.getElementById('root'));
+const root = createRoot(document.getElementById('root'));
+root.render(<Example/>);

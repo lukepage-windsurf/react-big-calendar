@@ -31,7 +31,7 @@ export default function withDragAndDrop(Calendar, {
       this.state = { isDragging: false };
     }
 
-    componentWillMount() {
+    componentDidMount() {
       let monitor = this.context.dragDropManager.getMonitor()
       this.monitor = monitor
       this.unsubscribeToStateChange = monitor

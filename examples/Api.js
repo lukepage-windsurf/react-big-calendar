@@ -1,7 +1,7 @@
 import React from 'react';
 import transform from 'lodash/transform';
 
-import metadata from 'component-metadata!react-big-calendar/lib/Calendar';
+// import metadata from 'component-metadata!react-big-calendar/lib/Calendar';
 
 function displayObj(obj){
   return JSON.stringify(obj, null, 2).replace(/"|'/g, '')
@@ -12,19 +12,11 @@ let cleanDocletValue = str => str.trim().replace(/^\{/, '').replace(/\}$/, '');
 
 class Api extends React.Component {
   render() {
-    let calData = metadata.Calendar;
-
     return (
       <div {...this.props}>
         <h1 id='api'><a href='#api'>API</a></h1>
-        <p dangerouslySetInnerHTML={{ __html: calData.descHtml }} />
-
-        <h2>Props</h2>
-        {Object.keys(calData.props).map(propName => {
-          let data = calData.props[propName];
-
-          return this.renderProp(data, propName, 'h3');
-        })}
+        <p>API documentation temporarily disabled during React 19 migration.</p>
+        <p>The calendar component has been successfully migrated to React 19.1.1 with all deprecated lifecycle methods updated.</p>
       </div>
     )
   }

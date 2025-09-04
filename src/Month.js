@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { findDOMNode } from 'react-dom';
 import cn from 'classnames';
 
 import dates from './utils/dates';
@@ -78,20 +77,27 @@ class MonthView extends React.Component {
   static displayName = 'MonthView';
   static propTypes = propTypes;
 
-  state = {
-    rowLimit: 5,
-    needLimitMeasure: true
-  };
-
-  componentWillMount() {
+  constructor(props) {
+    super(props);
+    this.state = {
+      rowLimit: 5,
+      needLimitMeasure: true
+    };
     this._bgRows = []
     this._pendingSelection = []
+    this.nodeRef = React.createRef();
+    this.slotRowRef = React.createRef();
   }
 
-  componentWillReceiveProps({ date }) {
-    this.setState({
-      needLimitMeasure: !dates.eq(date, this.props.date)
-    })
+  componentDidUpdate(prevProps) {
+    if (!dates.eq(this.props.date, prevProps.date)) {
+      this.setState({
+        needLimitMeasure: true
+      })
+    }
+    
+    if (this.state.needLimitMeasure)
+      this.measureRowLimit(this.props)
   }
 
   componentDidMount() {
@@ -110,17 +116,12 @@ class MonthView extends React.Component {
     }, false)
   }
 
-  componentDidUpdate() {
-    if (this.state.needLimitMeasure)
-      this.measureRowLimit(this.props)
-  }
-
   componentWillUnmount() {
     window.removeEventListener('resize', this._resizeListener, false)
   }
 
   getContainer = () => {
-    return findDOMNode(this)
+    return this.nodeRef.current
   };
 
   render() {
@@ -131,7 +132,7 @@ class MonthView extends React.Component {
     this._weekCount = weeks.length;
 
     return (
-      <div className={cn('rbc-month-view', className)}>
+      <div className={cn('rbc-month-view', className)} ref={this.nodeRef}>
         <div className='rbc-row rbc-month-header'>
           {this._headers(weeks[0], weekdayFormat, culture)}
         </div>
@@ -167,7 +168,7 @@ class MonthView extends React.Component {
       <DateContentRow
         key={weekIdx}
         ref={weekIdx === 0
-          ? 'slotRow' : undefined
+          ? this.slotRowRef : undefined
         }
         container={this.getContainer}
         className='rbc-month-row'
@@ -282,7 +283,7 @@ class MonthView extends React.Component {
   measureRowLimit = () => {
     this.setState({
       needLimitMeasure: false,
-      rowLimit: this.refs.slotRow.getRowLimit(),
+      rowLimit: this.slotRowRef.current.getRowLimit(),
     })
   };
 
@@ -325,7 +326,7 @@ class MonthView extends React.Component {
     this.clearSelection()
 
     if (popup) {
-      let position = getPosition(cell, findDOMNode(this));
+      let position = getPosition(cell, this.nodeRef.current);
 
       this.setState({
         overlay: { date, events, position }
