@@ -95,9 +95,6 @@ export default class MultiTimeGrid extends Component {
     // for checking which axis the content grid was scrolled
     this._lastScrollTop = 0;
     this._lastScrollLeft = 0;
-  }
-
-  componentWillMount() {
     this._gutters = [];
     this.calculateScroll();
   }
