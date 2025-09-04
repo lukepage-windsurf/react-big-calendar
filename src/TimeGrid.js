@@ -85,9 +85,6 @@ export default class TimeGrid extends Component {
     this.state = { gutterWidth: undefined, isOverflowing: null };
     this.handleSelectEvent = this.handleSelectEvent.bind(this)
     this.handleHeaderClick = this.handleHeaderClick.bind(this)
-  }
-
-  componentWillMount() {
     this._gutters = [];
     this.calculateScroll();
   }
