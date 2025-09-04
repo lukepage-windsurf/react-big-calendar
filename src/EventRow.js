@@ -1,18 +1,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import createReactClass from 'create-react-class';
 import EventRowMixin from './EventRowMixin';
 
+class EventRow extends React.Component {
+  static displayName = 'EventRow';
 
-let EventRow = createReactClass({
-
-  displayName: 'EventRow',
-
-  propTypes: {
+  static propTypes = {
     segments: PropTypes.array
-  },
+  };
 
-  mixins: [EventRowMixin],
+  renderEvent = EventRowMixin.renderEvent;
+  renderSpan = EventRowMixin.renderSpan;
 
   render(){
     let { segments } = this.props;
@@ -43,6 +41,6 @@ let EventRow = createReactClass({
       </div>
     )
   }
-});
+}
 
 export default EventRow

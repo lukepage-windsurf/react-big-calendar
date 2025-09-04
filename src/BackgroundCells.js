@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { findDOMNode } from 'react-dom';
 import cn from 'classnames';
 
 import dates from './utils/dates';
@@ -34,6 +33,7 @@ class BackgroundCells extends React.Component {
     this.state = {
       selecting: false
     };
+    this.nodeRef = React.createRef();
   }
 
   componentDidMount(){
@@ -45,11 +45,11 @@ class BackgroundCells extends React.Component {
     this._teardownSelectable();
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.selectable && !this.props.selectable)
+  componentDidUpdate(prevProps) {
+    if (this.props.selectable && !prevProps.selectable)
       this._selectable();
 
-    if (!nextProps.selectable && this.props.selectable)
+    if (!this.props.selectable && prevProps.selectable)
       this._teardownSelectable();
   }
 
@@ -58,7 +58,7 @@ class BackgroundCells extends React.Component {
     let { selecting, startIdx, endIdx } = this.state;
 
     return (
-      <div className='rbc-row-bg'>
+      <div className='rbc-row-bg' ref={this.nodeRef}>
         {range.map((date, index) => {
           let selected =  selecting && index >= startIdx && index <= endIdx;
           return (
@@ -81,7 +81,7 @@ class BackgroundCells extends React.Component {
   }
 
   _selectable(){
-    let node = findDOMNode(this);
+    let node = this.nodeRef.current;
     let selector = this._selector = new Selection(this.props.container)
 
     selector.on('selecting', box => {
@@ -114,12 +114,12 @@ class BackgroundCells extends React.Component {
     selector.on('mousedown', (box) => {
       if (this.props.selectable !== 'ignoreEvents') return
 
-      return !isEvent(findDOMNode(this), box)
+      return !isEvent(this.nodeRef.current, box)
     })
 
     selector
       .on('click', point => {
-        if (!isEvent(findDOMNode(this), point)) {
+        if (!isEvent(this.nodeRef.current, point)) {
           let rowBox = getBoundsForNode(node)
           let { range, rtl } = this.props;
 

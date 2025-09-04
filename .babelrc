@@ -1,3 +1,9 @@
 {
-  "presets": ["jason"]
+  "presets": [
+    ["@babel/preset-env", { "targets": { "browsers": ["ie >= 10", "last 2 versions"] } }],
+    ["@babel/preset-react", { "runtime": "automatic" }]
+  ],
+  "plugins": [
+    "@babel/plugin-proposal-export-default-from"
+  ]
 }

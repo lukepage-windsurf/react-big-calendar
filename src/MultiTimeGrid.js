@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { findDOMNode } from 'react-dom';
 
 import dates from './utils/dates';
 import localizer from './localizer'
@@ -95,12 +94,10 @@ export default class MultiTimeGrid extends Component {
     // for checking which axis the content grid was scrolled
     this._lastScrollTop = 0;
     this._lastScrollLeft = 0;
-  }
-
-  componentWillMount() {
     this._gutters = [];
     this.calculateScroll();
   }
+
 
   componentDidMount() {
     this.checkOverflow();
@@ -111,29 +108,26 @@ export default class MultiTimeGrid extends Component {
     this.applyScroll();
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
+    const { start, scrollToTime } = prevProps;
+
     if (this.props.width == null && !this.state.gutterWidth) {
       this.measureGutter()
     }
 
     this.applyScroll();
     //this.checkOverflow()
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const { start, scrollToTime } = this.props;
 
     this.setEntityKeyTypeIfNecessary();
 
     // When paginating, reset scroll
     if (
-      nextProps.view !== this.props.view &&
-      (!dates.eq(nextProps.start, start, 'minute') ||
-       !dates.eq(nextProps.scrollToTime, scrollToTime, 'minute'))
+      this.props.view !== prevProps.view &&
+      (!dates.eq(this.props.start, start, 'minute') ||
+       !dates.eq(this.props.scrollToTime, scrollToTime, 'minute'))
     ) {
       this.calculateScroll();
     }
-
   }
 
   onHeaderSelectChange = ({ target }) => {
@@ -193,7 +187,7 @@ export default class MultiTimeGrid extends Component {
       });
     }
 
-    let gutterRef = ref => this._gutters[1] = ref && findDOMNode(ref);
+    let gutterRef = ref => this._gutters[1] = ref && ref;
 
     return (
       <div className='rbc-time-view'>

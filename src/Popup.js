@@ -19,10 +19,14 @@ const propTypes = {
   dayHeaderFormat: dateFormat
 }
 class Popup extends React.Component {
+  constructor(props) {
+    super(props);
+    this.rootRef = React.createRef();
+  }
 
   componentDidMount(){
     let { popupOffset = 5 } = this.props
-      , { top, left, width, height } = getOffset(this.refs.root)
+      , { top, left, width, height } = getOffset(this.rootRef.current)
       , viewBottom = window.innerHeight + getScrollTop(window)
       , viewRight = window.innerWidth + getScrollLeft(window)
       , bottom = top + height
@@ -54,7 +58,7 @@ class Popup extends React.Component {
     }
 
     return (
-      <div ref='root' style={style} className='rbc-overlay'>
+      <div ref={this.rootRef} style={style} className='rbc-overlay'>
         <div className='rbc-overlay-header'>
           { localizer.format(props.slotStart, props.dayHeaderFormat, props.culture) }
         </div>

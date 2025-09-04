@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { findDOMNode } from 'react-dom';
 import cn from 'classnames';
 
 import Selection, { getBoundsForNode, isEvent } from './Selection';
@@ -29,6 +28,11 @@ function startsAfter(date, max) {
 }
 
 class DaySlot extends React.Component {
+  constructor(props) {
+    super(props);
+    this.nodeRef = React.createRef();
+  }
+
   static propTypes = {
     availabilities: PropTypes.array,
     availabilityKeyAccessor: PropTypes.string,
@@ -95,10 +99,10 @@ class DaySlot extends React.Component {
     this._teardownSelectable();
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.selectable && !this.props.selectable)
+  componentDidUpdate(prevProps) {
+    if (this.props.selectable && !prevProps.selectable)
       this._selectable();
-    if (!nextProps.selectable && this.props.selectable)
+    if (!this.props.selectable && prevProps.selectable)
       this._teardownSelectable();
   }
 
@@ -128,6 +132,7 @@ class DaySlot extends React.Component {
     return (
       <TimeColumn
         {...props}
+        ref={this.nodeRef}
         className={cn(
           'rbc-day-slot',
           !isMultiGrid && dates.isToday(max, nowTimezone) && 'rbc-today',
@@ -289,8 +294,8 @@ class DaySlot extends React.Component {
   };
 
   _selectable = () => {
-    let node = findDOMNode(this);
-    let selector = this._selector = new Selection(()=> findDOMNode(this))
+    let node = this.nodeRef.current;
+    let selector = this._selector = new Selection(()=> this.nodeRef.current)
 
     /* Disabling drag-selection for now
     let maybeSelect = (box) => {
@@ -361,12 +366,12 @@ class DaySlot extends React.Component {
     selector.on('mousedown', (box) => {
       if (this.props.selectable !== 'ignoreEvents') return
 
-      return !isEvent(findDOMNode(this), box)
+      return !isEvent(this.nodeRef.current, box)
     })
 
     selector
       .on('click', (box) => {
-        if (!isEvent(findDOMNode(this), box))
+        if (!isEvent(this.nodeRef.current, box))
           this._selectSlot(selectionState(box))
 
         this.setState({ selecting: false })
